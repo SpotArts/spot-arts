@@ -1,0 +1,43 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { products, formatPrice } from "../data/products.js";
+
+const categorie = Astro.url.searchParams.get("categorie");
+const categories = [...new Set(products.map(p => p.category))];
+const filtered = categorie ? products.filter(p => p.category === categorie) : products;
+---
+<Layout title="Catalogue — Spot Arts">
+  <section class="max-w-6xl mx-auto px-5 py-10">
+    <h1 class="font-display text-3xl text-brun-dark mb-2">Catalogue</h1>
+    <p class="text-brun/60 mb-8">{filtered.length} produit{filtered.length > 1 ? "s" : ""}</p>
+
+    <div class="flex flex-wrap gap-2 mb-10">
+      <a href="/catalogue"
+         class={`px-4 py-1.5 rounded-full text-sm border ${!categorie ? "bg-brun-dark text-creme border-brun-dark" : "border-brun/20 hover:bg-terracotta/20"}`}>
+        Tous
+      </a>
+      {categories.map(cat => (
+        <a href={`/catalogue?categorie=${encodeURIComponent(cat)}`}
+           class={`px-4 py-1.5 rounded-full text-sm border ${categorie === cat ? "bg-brun-dark text-creme border-brun-dark" : "border-brun/20 hover:bg-terracotta/20"}`}>
+          {cat}
+        </a>
+      ))}
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {filtered.map(p => (
+        <a href={`/produit/${p.slug}`} class="group border border-brun/10 rounded-2xl p-4 hover:shadow-md transition-shadow">
+          <div class="aspect-square rounded-xl bg-terracotta-light overflow-hidden mb-3">
+            <img src={p.image} alt={p.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.style.display='none'" />
+          </div>
+          <p class="text-xs text-terracotta-dark mb-1">{p.category}</p>
+          <p class="font-medium text-sm text-brun-dark mb-1">{p.name}</p>
+          <div class="flex items-baseline gap-2">
+            {p.oldPrice && <span class="text-xs text-brun/40 line-through">{formatPrice(p.oldPrice)}</span>}
+            <span class="text-terracotta-dark font-semibold text-sm">{formatPrice(p.price)}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
